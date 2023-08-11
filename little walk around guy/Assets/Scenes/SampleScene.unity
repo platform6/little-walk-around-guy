@@ -260,7 +260,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   followSpeed: 0.1
-  offset: {x: 0, y: 3, z: -10}
+  offset: {x: 0, y: 0, z: -1}
 --- !u!1 &1007584192
 GameObject:
   m_ObjectHideFlags: 0

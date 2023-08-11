@@ -96,6 +96,6 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce);    
         }
-        anim.SetBool("Jumping", !Grounded());
+        anim.SetBool("jumping", !Grounded());
     }
 }
