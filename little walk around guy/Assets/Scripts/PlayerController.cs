@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour
         
     [SerializeField] private float walkSpeed = 1;
     [SerializeField] private float jumpForce = 45;
+    private int jumpBufferCounter = 0;
+    [SerializeField] private int jumpBufferFrames;
 
     [Header("Ground Check Settings")]
     [SerializeField] private Transform groundCheckPoint;
@@ -16,6 +18,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float groundCheckX = 0.5f;
     [SerializeField] private LayerMask whatIsGround;
 
+    PlayerStateList pState;
     private Rigidbody2D rb;
     private float xAxis;
     Animator anim;
@@ -37,6 +40,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        pState = GetComponent<PlayerStateList>();
      rb = GetComponent<Rigidbody2D>();
      anim = GetComponent<Animator>();
     }
@@ -45,9 +49,11 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         GetInputs();
+        UpdateJumpVariables();
+        Flip();
         Move();
         Jump();
-        Flip();
+        
     }
 
     void GetInputs()
@@ -91,11 +97,36 @@ public class PlayerController : MonoBehaviour
         if(Input.GetButtonUp("Jump") && rb.velocity.y > 0)
         {
             rb.velocity = new Vector2(rb.velocity.x, 0);
+
+            pState.jumping = false;
         }
-        if(Input.GetButtonDown("Jump") && Grounded())
+        if (!pState.jumping)
         {
-            rb.velocity = new Vector3(rb.velocity.x, jumpForce);    
+            if (jumpBufferCounter > 0 && Grounded())
+            {
+                rb.velocity = new Vector3(rb.velocity.x, jumpForce);
+
+                pState.jumping = true;
+            }
+
         }
+      
         anim.SetBool("jumping", !Grounded());
+    }
+
+    void UpdateJumpVariables()
+    {
+        if (Grounded())
+        {
+            pState.jumping = false;
+        }
+        if (Input.GetButtonDown("Jump"))
+        {
+            jumpBufferCounter = jumpBufferFrames;
+        }
+        else
+        {
+            jumpBufferCounter--;
+        }
     }
 }
