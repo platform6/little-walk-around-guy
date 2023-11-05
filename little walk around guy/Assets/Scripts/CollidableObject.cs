@@ -9,19 +9,27 @@ public class CollidableObject : MonoBehaviour
     [SerializeField]
     private ContactFilter2D z_Filter;
     private List<Collider2D> z_CollidedObjects = new List<Collider2D>(1);
+    public AudioSource audioSource;
 
     protected virtual void Start()
     {
         z_Collider = GetComponent<Collider2D>();
-    }
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+   
+}
 
     protected virtual void Update()
     {
         z_Collider.OverlapCollider(z_Filter, z_CollidedObjects);
         foreach (var o in z_CollidedObjects)
         {
+           //   UnityEngine.Debug.Log("HERE is " + name);
             OnCollided(o.gameObject);
-
+            
         }
      }
 
