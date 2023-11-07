@@ -8,8 +8,10 @@ public class InteractableObject : CollidableObject
     private bool z_Interacted = false;
     public Sprite newSprite;
     public AudioClip interactionSound;
+    [SerializeField]
+    private bool kill;
 
-    protected override void OnCollided(GameObject collidedObject)
+    protected override void OnCollided(GameObject gameObject)
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -35,7 +37,11 @@ public class InteractableObject : CollidableObject
                 audioSource.PlayOneShot(interactionSound);
             }
 
-            Destroy(gameObject, 4f);
+            if (kill) {
+
+                Destroy(gameObject, 4f);
+
+            };
         }
     }
 }
