@@ -5,43 +5,47 @@ using UnityEngine;
 
 public class InteractableObject : CollidableObject
 {
-    private bool z_Interacted = false;
+    private bool hasInteracted = false;
     public Sprite newSprite;
     public AudioClip interactionSound;
+    public DialogueTrigger dialogueTrigger;
+
     [SerializeField]
     private bool kill;
 
-    protected override void OnCollided(GameObject gameObject)
+    public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        base.Update();
+        if (IsPlayerNearby() && Input.GetKeyDown(KeyCode.E) && !hasInteracted)
         {
-            OnInteract();
+            
+            Interact();
         }
     }
-    private void OnInteract()
+
+    private void Interact()
     {
-        Debug.Log("interact with " + name);
+        hasInteracted = true;
+        Debug.Log("Interacting with " + name);
 
-        if (!z_Interacted)
+        // Change sprite if applicable
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && newSprite != null)
         {
-            z_Interacted=true;
-            SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+            spriteRenderer.sprite = newSprite;
+        }
 
-            if (spriteRenderer != null && newSprite != null)
-            {
-                spriteRenderer.sprite = newSprite;
-            }
+        // Play sound if applicable
+        AudioSource audioSource = GetComponent<AudioSource>();
+        if (interactionSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(interactionSound);
+        }
 
-            if (interactionSound != null && audioSource != null) // Play the sound if the audio clip and AudioSource are set
-            {
-                audioSource.PlayOneShot(interactionSound);
-            }
-
-            if (kill) {
-
-                Destroy(gameObject, 4f);
-
-            };
+        // Trigger dialogue
+        if (dialogueTrigger != null)
+        {
+            dialogueTrigger.TriggerDialogue();
         }
     }
 }

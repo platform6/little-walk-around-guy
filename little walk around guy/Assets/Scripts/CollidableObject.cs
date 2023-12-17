@@ -6,37 +6,36 @@ using UnityEngine;
 public class CollidableObject : MonoBehaviour
 {
     private Collider2D z_Collider;
-    [SerializeField]
-    private ContactFilter2D z_Filter;
-    private List<Collider2D> z_CollidedObjects = new List<Collider2D>(1);
-    public AudioSource audioSource;
+    public List<Collider2D> nearbyColliders = new List<Collider2D>();
 
-    protected virtual void Start()
+    public void Start()
     {
         z_Collider = GetComponent<Collider2D>();
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-        {
-            audioSource = gameObject.AddComponent<AudioSource>();
-        }
-   
-}
-
-    protected virtual void Update()
-    {
-        z_Collider.OverlapCollider(z_Filter, z_CollidedObjects);
-        foreach (var o in z_CollidedObjects)
-        {
-           //   UnityEngine.Debug.Log("HERE is " + name);
-            OnCollided(o.gameObject);
-            
-        }
-     }
-
-    protected virtual void OnCollided(GameObject collidedObject)
-    {
-       // UnityEngine.Debug.Log("Collided with " + collidedObject.name);
-
     }
 
+    public void Update()
+    {
+        // Clear the list of nearby colliders
+        nearbyColliders.Clear();
+        
+
+        // Fill the list with colliders currently overlapping with this object
+        ContactFilter2D filter = new ContactFilter2D().NoFilter();
+        z_Collider.OverlapCollider(filter, nearbyColliders);
+        
+    }
+
+    public bool IsPlayerNearby()
+    {
+        foreach (var collider in nearbyColliders)
+        {
+            if (collider.CompareTag("Player")) // Assuming the player has a tag "Player"
+            {
+                // UnityEngine.Debug.Log("Player is nearby the object: " + gameObject.name);
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }
