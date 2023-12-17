@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditorInternal;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -9,8 +8,8 @@ public class PlayerController : MonoBehaviour
         
     [SerializeField] private float walkSpeed = 1;
     [SerializeField] private float jumpForce = 45;
-    private int jumpBufferCounter = 0;
-    [SerializeField] private int jumpBufferFrames;
+    private float jumpBufferTimer = 0f;
+    [SerializeField] private float jumpBufferTime = 0.2f;
 
     [Header("Ground Check Settings")]
     [SerializeField] private Transform groundCheckPoint;
@@ -51,9 +50,13 @@ public class PlayerController : MonoBehaviour
         GetInputs();
         UpdateJumpVariables();
         Flip();
+        
+    }
+
+    void FixedUpdate()
+    {
         Move();
         Jump();
-        
     }
 
     void GetInputs()
@@ -102,11 +105,11 @@ public class PlayerController : MonoBehaviour
         }
         if (!pState.jumping)
         {
-            if (jumpBufferCounter > 0 && Grounded())
+            if (jumpBufferTimer > 0 && Grounded())
             {
-                rb.velocity = new Vector3(rb.velocity.x, jumpForce);
-
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
                 pState.jumping = true;
+                jumpBufferTimer = 0;
             }
 
         }
@@ -122,11 +125,11 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetButtonDown("Jump"))
         {
-            jumpBufferCounter = jumpBufferFrames;
+            jumpBufferTimer = jumpBufferTime;  // Use time instead of frames
         }
-        else
+        else if (jumpBufferTimer > 0)
         {
-            jumpBufferCounter--;
+            jumpBufferTimer -= Time.deltaTime;  // Decrease timer based on time
         }
     }
 }
